@@ -1,0 +1,1184 @@
+<title>MedFind</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600;700;800&display=swap">
+<style>
+/* ── TOKENS ── */
+:root{
+  --bg:#F5F6FA;
+  --card:#FFFFFF;
+  --card2:#F0F2F8;
+  --sh:0 2px 12px rgba(80,100,160,.08);
+  --sh-md:0 6px 24px rgba(80,100,160,.10);
+  --sh-lg:0 12px 40px rgba(80,100,160,.12);
+  --text:#1A2D5A;--text2:#6B7A9B;--text3:#9AA5BC;
+  --accent:#4A80E8;--accentL:#E8F0FF;
+  --orange:#FF8C42;--pink:#FF6B9D;--grn:#22C55E;
+  --r-xl:22px;--r-lg:18px;--r-md:14px;--r-sm:10px;--r-full:999px;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141820;
+  --card:#1E2230;--card2:#232840;
+  --sh:0 4px 20px rgba(0,0,0,.30);--sh-md:0 8px 32px rgba(0,0,0,.35);
+  --sh-lg:0 16px 48px rgba(0,0,0,.45);
+  --text:#E8F0FF;--text2:#8B9BBE;--text3:#4A5A7B;
+  --accentL:rgba(74,128,232,.15);
+}}
+:root[data-theme="dark"]{
+  --bg:#141820;
+  --card:#1E2230;--card2:#232840;
+  --sh:0 4px 20px rgba(0,0,0,.30);--sh-md:0 8px 32px rgba(0,0,0,.35);
+  --sh-lg:0 16px 48px rgba(0,0,0,.45);
+  --text:#E8F0FF;--text2:#8B9BBE;--text3:#4A5A7B;
+  --accentL:rgba(74,128,232,.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);}
+body{font-family:'Poppins','Sarabun',system-ui,sans-serif;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px 16px;min-height:100vh;}
+#root{display:flex;justify-content:center;width:100%;}
+
+/* ── PHONE ── */
+.phone{width:390px;max-width:100%;min-height:840px;
+  background:var(--bg);border-radius:46px;overflow:hidden;
+  display:flex;flex-direction:column;position:relative;
+  box-shadow:0 0 0 1px rgba(255,255,255,.5),var(--sh-lg),
+    inset 0 1px 0 rgba(255,255,255,.7);}
+
+/* ── STATUS BAR ── */
+.sbar{display:flex;align-items:center;justify-content:space-between;
+  padding:14px 26px 6px;font-size:.63rem;font-weight:700;color:var(--text);
+  flex-shrink:0;letter-spacing:.02em;}
+.sbar-r{display:flex;align-items:center;gap:5px;}
+.sbar-r svg{width:13px;height:13px;fill:var(--text);}
+
+/* ── SCROLLABLE SCREEN ── */
+.scr{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:90px;}
+.scr::-webkit-scrollbar{display:none;}
+
+/* ── HOME: TOP BAR ── */
+.h-topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:8px 22px 6px;}
+.h-menu{width:36px;height:36px;display:flex;flex-direction:column;
+  justify-content:center;gap:5px;cursor:pointer;padding:4px;}
+.h-menu span{display:block;height:2px;background:var(--text);border-radius:2px;}
+.h-menu span:first-child{width:18px;}
+.h-menu span:nth-child(2){width:26px;}
+.h-menu span:last-child{width:22px;}
+.h-signup{display:flex;align-items:center;gap:5px;
+  background:linear-gradient(120deg,#4A80E8,#8B5CF6);
+  border:none;border-radius:var(--r-full);padding:8px 15px;
+  font-size:.7rem;font-weight:700;font-family:inherit;color:#fff;
+  cursor:pointer;box-shadow:0 4px 14px rgba(74,128,232,.35);
+  transition:opacity .15s,transform .1s;flex-shrink:0;}
+.h-signup:active{opacity:.85;transform:scale(.97);}
+.h-avatar{width:38px;height:38px;border-radius:50%;
+  background:linear-gradient(135deg,#4A80E8,#8B5CF6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;cursor:pointer;box-shadow:var(--sh);}
+
+/* ── HOME: HERO ── */
+.h-hero{padding:6px 24px 20px;}
+.h-title{font-size:1.55rem;font-weight:800;color:var(--text);
+  line-height:1.25;letter-spacing:-.03em;}
+
+/* ── HOME: CATEGORIES ── */
+.h-cats{display:flex;align-items:center;gap:10px;
+  padding:0 18px 22px;overflow-x:auto;}
+.h-cats::-webkit-scrollbar{display:none;}
+.h-cat{display:flex;flex-direction:column;align-items:center;gap:7px;
+  flex-shrink:0;cursor:pointer;}
+.h-cat-circle{width:62px;height:62px;border-radius:50%;
+  background:var(--card);box-shadow:var(--sh);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s,box-shadow .15s;}
+.h-cat-circle:hover{transform:translateY(-2px);box-shadow:var(--sh-md);}
+.h-cat-circle svg{width:30px;height:30px;}
+.h-cat-lbl{font-size:.6rem;font-weight:600;color:var(--text2);text-align:center;max-width:62px;}
+
+/* ── HOME: SEARCH ── */
+.h-search{margin:0 22px 22px;
+  background:var(--card);border-radius:var(--r-lg);box-shadow:var(--sh);
+  display:flex;align-items:center;gap:10px;padding:13px 16px;}
+.h-search svg{width:17px;height:17px;stroke:var(--text3);
+  fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.h-search input{flex:1;border:none;background:transparent;outline:none;
+  font-size:.87rem;font-family:inherit;color:var(--text);}
+.h-search input::placeholder{color:var(--text3);}
+
+/* ── HOME: CALENDAR ── */
+.h-cal{padding:0 22px 22px;}
+.h-cal-month{font-size:.92rem;font-weight:700;color:var(--text);margin-bottom:14px;}
+.h-cal-week{display:flex;gap:6px;}
+.h-cal-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;
+  cursor:pointer;}
+.h-cal-dname{font-size:.58rem;font-weight:600;color:var(--text3);letter-spacing:.05em;}
+.h-cal-dnum{width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.82rem;font-weight:700;color:var(--text2);
+  transition:background .15s,color .15s;}
+.h-cal-day.act .h-cal-dname{color:var(--accent);}
+.h-cal-day.act .h-cal-dnum{background:var(--accent);color:#fff;
+  box-shadow:0 4px 14px rgba(74,128,232,.35);}
+
+/* ── HOME: FEATURED DOCTOR ── */
+.h-feat{margin:0 22px 22px;background:var(--card);border-radius:var(--r-xl);
+  box-shadow:var(--sh);padding:16px;}
+.h-feat-inner{display:flex;align-items:center;gap:14px;}
+.h-feat-info{flex:1;min-width:0;}
+.h-feat-name{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:3px;}
+.h-feat-spec{font-size:.72rem;color:var(--text2);margin-bottom:8px;}
+.h-feat-avail{font-size:.7rem;font-weight:600;color:var(--orange);}
+.h-feat-right{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.h-feat-av{width:54px;height:54px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.7rem;position:relative;flex-shrink:0;}
+.h-feat-dot{position:absolute;bottom:2px;right:2px;width:10px;height:10px;
+  border-radius:50%;background:var(--grn);border:2px solid var(--card);}
+.h-feat-btn{background:var(--text);color:#fff;border:none;border-radius:var(--r-full);
+  padding:7px 14px;font-size:.68rem;font-weight:700;font-family:inherit;
+  cursor:pointer;white-space:nowrap;}
+
+/* ── SECTION HEADER ── */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;
+  padding:0 22px;margin-bottom:14px;}
+.sec-ttl{font-size:.88rem;font-weight:700;color:var(--text);}
+.sec-see{font-size:.73rem;font-weight:600;color:var(--accent);cursor:pointer;
+  background:none;border:none;font-family:inherit;}
+
+/* ── HOME: TOP RATED (horizontal scroll) ── */
+.h-rated{display:flex;gap:12px;padding:0 22px 22px;overflow-x:auto;}
+.h-rated::-webkit-scrollbar{display:none;}
+.h-doc-card{flex-shrink:0;width:140px;background:var(--card);
+  border-radius:var(--r-xl);box-shadow:var(--sh);padding:14px 12px;
+  cursor:pointer;transition:transform .15s,box-shadow .15s;
+  display:flex;flex-direction:column;align-items:center;}
+.h-doc-card:hover{transform:translateY(-2px);box-shadow:var(--sh-md);}
+.h-doc-av{width:54px;height:54px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;margin-bottom:9px;position:relative;}
+.h-doc-avdot{position:absolute;bottom:2px;right:2px;width:9px;height:9px;
+  border-radius:50%;background:var(--grn);border:2px solid var(--card);}
+.h-doc-nm{font-size:.75rem;font-weight:700;color:var(--text);text-align:center;
+  line-height:1.3;margin-bottom:3px;}
+.h-doc-sp{font-size:.62rem;color:var(--text3);text-align:center;margin-bottom:9px;}
+.h-doc-appt{width:100%;padding:7px 0;border-radius:var(--r-full);
+  border:1.5px solid var(--text);background:transparent;
+  font-size:.65rem;font-weight:700;font-family:inherit;color:var(--text);
+  cursor:pointer;transition:background .15s,color .15s;}
+.h-doc-appt:hover{background:var(--text);color:#fff;}
+
+/* ── LIST SCREEN ── */
+.list-hdr{display:flex;align-items:center;justify-content:center;
+  padding:10px 22px 16px;position:relative;}
+.list-back{position:absolute;left:22px;width:36px;height:36px;border-radius:50%;
+  background:var(--card);box-shadow:var(--sh);border:none;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.list-back svg{width:18px;height:18px;stroke:var(--text);fill:none;
+  stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.list-title{font-size:1rem;font-weight:700;color:var(--text);}
+.list-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 18px 16px;}
+.list-card{background:var(--card);border-radius:var(--r-xl);box-shadow:var(--sh);
+  padding:18px 14px;display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;transition:transform .14s,box-shadow .14s;}
+.list-card:hover{transform:translateY(-2px);box-shadow:var(--sh-md);}
+.list-av{width:70px;height:70px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.1rem;margin-bottom:10px;position:relative;}
+.list-avdot{position:absolute;bottom:3px;right:3px;width:11px;height:11px;
+  border-radius:50%;background:var(--grn);border:2.5px solid var(--card);}
+.list-nm{font-size:.78rem;font-weight:700;color:var(--text);text-align:center;
+  line-height:1.3;margin-bottom:4px;}
+.list-sp{font-size:.65rem;color:var(--text3);text-align:center;margin-bottom:12px;}
+.list-appt-btn{width:100%;padding:8px 0;border-radius:var(--r-full);
+  border:1.5px solid var(--text2);background:transparent;
+  font-size:.67rem;font-weight:600;font-family:inherit;color:var(--text2);
+  cursor:pointer;transition:border-color .15s,background .15s,color .15s;}
+.list-appt-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ── DETAIL SCREEN ── */
+.det-hdr{display:flex;align-items:center;justify-content:center;
+  padding:10px 22px 18px;position:relative;}
+.det-back{position:absolute;left:22px;width:36px;height:36px;border-radius:50%;
+  background:var(--card);box-shadow:var(--sh);border:none;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.det-back svg{width:18px;height:18px;stroke:var(--text);fill:none;
+  stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.det-title{font-size:1rem;font-weight:700;color:var(--text);}
+.det-doc-row{display:flex;align-items:center;gap:14px;
+  margin:0 22px 18px;background:var(--card);border-radius:var(--r-xl);
+  box-shadow:var(--sh);padding:16px;}
+.det-doc-av{width:60px;height:60px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:2rem;
+  position:relative;}
+.det-doc-avdot{position:absolute;bottom:2px;right:2px;width:11px;height:11px;
+  border-radius:50%;background:var(--grn);border:2.5px solid var(--card);}
+.det-doc-info{flex:1;min-width:0;}
+.det-doc-name{font-size:.95rem;font-weight:800;color:var(--text);margin-bottom:4px;}
+.det-doc-spec{font-size:.73rem;color:var(--text2);}
+.det-stats{display:flex;gap:14px;margin:0 22px 20px;}
+.det-stat{flex:1;background:var(--card);border-radius:var(--r-lg);
+  box-shadow:var(--sh);padding:14px 12px;text-align:center;}
+.det-stat-lbl{font-size:.65rem;color:var(--text3);font-weight:500;margin-bottom:6px;}
+.det-stat-val{font-size:1.25rem;font-weight:800;}
+.det-stat-val.orange{color:var(--orange);}
+.det-stat-val.pink{color:var(--pink);}
+.det-book-btn{margin:0 22px 22px;width:calc(100% - 44px);padding:16px;
+  border-radius:var(--r-lg);border:none;
+  background:var(--accent);color:#fff;
+  font-size:.92rem;font-weight:700;font-family:inherit;cursor:pointer;
+  box-shadow:0 6px 22px rgba(74,128,232,.38);
+  transition:opacity .15s,transform .1s;}
+.det-book-btn:active{opacity:.88;transform:scale(.98);}
+.det-sec{margin:0 22px 22px;}
+.det-sec-ttl{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:8px;}
+.det-sec-body{font-size:.78rem;color:var(--text2);line-height:1.65;}
+.det-sched{background:var(--card);border-radius:var(--r-lg);box-shadow:var(--sh);
+  padding:14px 16px;display:flex;align-items:center;gap:14px;}
+.det-sched-badge{width:46px;flex-shrink:0;
+  background:var(--orange);border-radius:var(--r-md);
+  padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:1px;}
+.det-sched-dname{font-size:.55rem;font-weight:700;color:rgba(255,255,255,.8);
+  letter-spacing:.06em;}
+.det-sched-dnum{font-size:1.15rem;font-weight:800;color:#fff;line-height:1;}
+.det-sched-info{flex:1;min-width:0;}
+.det-sched-spec{font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:3px;}
+.det-sched-time{font-size:.72rem;color:var(--text2);}
+.det-sched-actions{display:flex;gap:8px;flex-shrink:0;}
+.det-sched-ic{width:34px;height:34px;border-radius:50%;border:none;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.det-sched-ic.call{background:#E8F8F0;}
+.det-sched-ic.vid{background:#EEF0FF;}
+.det-sched-ic svg{width:16px;height:16px;fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;}
+.det-sched-ic.call svg{stroke:#22C55E;}
+.det-sched-ic.vid svg{stroke:var(--accent);}
+
+/* ── BOTTOM NAV ── */
+.bnav{position:absolute;bottom:0;left:0;right:0;
+  background:var(--card);border-radius:0 0 46px 46px;
+  box-shadow:0 -4px 24px rgba(100,120,200,.10);
+  padding:12px 10px calc(12px + env(safe-area-inset-bottom,0px));}
+.bnav-inner{display:flex;align-items:center;justify-content:space-around;}
+.bni{display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:none;border:none;cursor:pointer;padding:4px 10px;font-family:inherit;
+  position:relative;}
+.bni svg{width:22px;height:22px;stroke:var(--text3);fill:none;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+  transition:stroke .15s;}
+.bni-lbl{font-size:.56rem;font-weight:600;color:var(--text3);transition:color .15s;}
+.bni.act svg{stroke:var(--accent);}
+.bni.act .bni-lbl{color:var(--accent);}
+.bni-badge{position:absolute;top:2px;right:8px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--accent);color:#fff;
+  font-size:.5rem;font-weight:800;
+  display:flex;align-items:center;justify-content:center;}
+.bni-fab{width:46px;height:46px;border-radius:50%;
+  background:var(--accent);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 20px rgba(74,128,232,.42);
+  transition:transform .15s,opacity .15s;margin-top:-8px;}
+.bni-fab:active{transform:scale(.93);}
+.bni-fab svg{width:22px;height:22px;stroke:#fff;fill:none;
+  stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ── AUTH ── */
+.auth-scr{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;}
+.auth-scr::-webkit-scrollbar{display:none;}
+.auth-hero{padding:36px 28px 28px;display:flex;flex-direction:column;align-items:center;
+  background:linear-gradient(155deg,#D8E8FF 0%,#E2E4FF 50%,#EAD8FF 100%);
+  position:relative;overflow:hidden;}
+.auth-hero::before{content:"";position:absolute;top:-50px;right:-50px;
+  width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.3);}
+.auth-hero::after{content:"";position:absolute;bottom:-30px;left:-30px;
+  width:120px;height:120px;border-radius:50%;background:rgba(160,130,255,.2);}
+.auth-logo{width:64px;height:64px;border-radius:20px;
+  background:linear-gradient(135deg,#4A80E8,#8B5CF6);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 24px rgba(74,128,232,.4);margin-bottom:13px;
+  position:relative;z-index:1;}
+.auth-logo svg{width:34px;height:34px;fill:none;stroke:#fff;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.auth-brand{font-size:1.55rem;font-weight:800;color:var(--text);
+  letter-spacing:-.03em;margin-bottom:4px;position:relative;z-index:1;}
+.auth-brand span{color:var(--accent);}
+.auth-tagline{font-size:.77rem;color:var(--text2);font-weight:500;
+  text-align:center;position:relative;z-index:1;}
+.auth-body{padding:22px 22px 28px;display:flex;flex-direction:column;gap:14px;}
+.auth-title{font-size:1.1rem;font-weight:800;color:var(--text);letter-spacing:-.02em;}
+.auth-sub{font-size:.76rem;color:var(--text3);}
+.auth-field{display:flex;flex-direction:column;gap:5px;}
+.auth-field label{font-size:.71rem;font-weight:600;color:var(--text2);}
+.auth-iw{display:flex;align-items:center;
+  background:var(--card2);border:1.5px solid transparent;border-radius:var(--r-md);
+  box-shadow:var(--sh);overflow:hidden;transition:border-color .15s;}
+.auth-iw:focus-within{border-color:var(--accent);}
+.auth-ii{padding:0 11px;display:flex;align-items:center;flex-shrink:0;}
+.auth-ii svg{width:16px;height:16px;stroke:var(--text3);fill:none;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.auth-inp{flex:1;border:none;background:transparent;outline:none;
+  font-size:.86rem;font-family:inherit;color:var(--text);padding:12px 0;}
+.auth-inp::placeholder{color:var(--text3);}
+.auth-eye{padding:0 11px;background:none;border:none;cursor:pointer;
+  display:flex;align-items:center;color:var(--text3);}
+.auth-eye svg{width:16px;height:16px;stroke:currentColor;fill:none;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.auth-err{font-size:.72rem;color:#EF4444;padding:8px 11px;
+  border-radius:var(--r-md);background:rgba(239,68,68,.08);
+  border:1px solid rgba(239,68,68,.18);}
+.auth-btn{width:100%;padding:14px;border-radius:var(--r-md);border:none;
+  background:linear-gradient(120deg,#4A80E8,#8B5CF6);color:#fff;
+  font-size:.88rem;font-weight:700;font-family:inherit;cursor:pointer;
+  box-shadow:0 6px 22px rgba(74,128,232,.38);
+  transition:opacity .15s,transform .1s;}
+.auth-btn:active{opacity:.88;transform:scale(.98);}
+.auth-div{display:flex;align-items:center;gap:10px;}
+.auth-div::before,.auth-div::after{content:"";flex:1;height:1px;background:#E8EAFF;}
+.auth-div span{font-size:.69rem;color:var(--text3);white-space:nowrap;}
+.auth-social{display:flex;gap:10px;}
+.auth-soc{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 8px;border-radius:var(--r-md);
+  border:1.5px solid #E8EAFF;background:var(--card);
+  cursor:pointer;font-size:.73rem;font-weight:600;font-family:inherit;
+  color:var(--text2);transition:border-color .15s;}
+.auth-soc:hover{border-color:var(--accent);}
+.auth-switch{text-align:center;font-size:.77rem;color:var(--text3);}
+.auth-swlink{color:var(--accent);font-weight:700;cursor:pointer;
+  background:none;border:none;font-family:inherit;font-size:inherit;
+  padding:0;margin-left:3px;}
+.auth-forgot{text-align:right;font-size:.71rem;color:var(--accent);
+  font-weight:600;cursor:pointer;background:none;border:none;font-family:inherit;}
+
+/* ── LANG TOGGLE ── */
+.lang-toggle{display:flex;align-items:center;background:var(--card2);
+  border-radius:var(--r-full);padding:3px;gap:2px;flex-shrink:0;}
+.lang-btn{padding:4px 10px;border-radius:var(--r-full);border:none;
+  font-size:.62rem;font-weight:700;font-family:inherit;cursor:pointer;
+  background:transparent;color:var(--text3);transition:all .15s;letter-spacing:.02em;}
+.lang-btn.act{background:var(--accent);color:#fff;
+  box-shadow:0 2px 8px rgba(74,128,232,.35);}
+
+/* ── FLOATING DR. PAW FAB ── */
+@keyframes paw-wander{
+  0%  {transform:translate(0px,0px)     rotate(-3deg);}
+  20% {transform:translate(-24px,-22px) rotate(2deg);}
+  40% {transform:translate(-10px,-36px) rotate(-2deg);}
+  60% {transform:translate(12px,-20px)  rotate(3deg);}
+  80% {transform:translate(18px,-6px)   rotate(-1deg);}
+  100%{transform:translate(0px,0px)     rotate(-3deg);}
+}
+@keyframes paw-shadow-pulse{
+  0%,100%{transform:scaleX(1);opacity:.18;}
+  50%    {transform:scaleX(.65);opacity:.08;}
+}
+@keyframes paw-bubble-in{
+  0%,15% {opacity:0;transform:scale(.7) translateY(8px);}
+  28%,72%{opacity:1;transform:scale(1)  translateY(0);}
+  85%,100%{opacity:0;transform:scale(.7) translateY(8px);}
+}
+@keyframes paw-ripple{
+  0%  {transform:scale(1);opacity:.45;}
+  100%{transform:scale(2.2);opacity:0;}
+}
+.paw-fab{
+  position:absolute;right:16px;bottom:100px;
+  z-index:20;cursor:pointer;
+  animation:paw-wander 5.5s ease-in-out infinite;
+  -webkit-tap-highlight-color:transparent;
+}
+.paw-fab:active{animation:none!important;transform:scale(.86);}
+.paw-fab-av{
+  position:relative;width:62px;height:62px;
+  border-radius:50%;overflow:hidden;
+  border:3px solid #fff;
+  box-shadow:0 8px 28px rgba(74,128,232,.28),0 2px 10px rgba(0,0,0,.12);
+}
+.paw-fab-av img{width:100%;height:100%;object-fit:cover;object-position:center 15%;}
+.paw-fab-dot{
+  position:absolute;bottom:3px;right:3px;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--grn);border:2.5px solid #fff;
+}
+.paw-fab-ripple{
+  position:absolute;inset:-4px;border-radius:50%;
+  border:2px solid var(--accent);
+  animation:paw-ripple 2.2s ease-out infinite;
+}
+.paw-fab-shadow{
+  width:44px;height:10px;border-radius:50%;
+  background:rgba(74,128,232,.18);
+  margin:4px auto 0;
+  animation:paw-shadow-pulse 5.5s ease-in-out infinite;
+}
+.paw-fab-bubble{
+  position:absolute;bottom:74px;right:0;
+  background:var(--card);
+  border-radius:14px 14px 0 14px;
+  padding:8px 12px;
+  font-size:.68rem;font-weight:600;color:var(--text);
+  white-space:nowrap;
+  box-shadow:var(--sh-md);
+  animation:paw-bubble-in 7s ease-in-out 0.8s infinite;
+  opacity:0;pointer-events:none;
+}
+.paw-fab-bubble::after{
+  content:"";position:absolute;bottom:-6px;right:16px;
+  border-style:solid;border-width:6px 0 0 6px;
+  border-color:var(--card) transparent transparent var(--card);
+}
+
+/* ── CHAT SCREEN ── */
+.chat-scr{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.chat-hdr{display:flex;align-items:center;gap:10px;
+  padding:12px 18px 10px;border-bottom:1px solid var(--card2);}
+.chat-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  background:var(--card2);border:none;border-radius:50%;cursor:pointer;flex-shrink:0;}
+.chat-back svg{width:16px;height:16px;fill:none;stroke:var(--text);stroke-width:2.5;
+  stroke-linecap:round;stroke-linejoin:round;}
+.chat-hdr-info{flex:1;}
+.chat-hdr-name{font-size:.88rem;font-weight:700;color:var(--text);}
+.chat-hdr-status{font-size:.65rem;color:var(--grn);font-weight:600;}
+.chat-hdr-av{width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;
+  box-shadow:var(--sh);}
+.chat-hdr-av img{width:100%;height:100%;object-fit:cover;object-position:center 20%;}
+
+.chat-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 16px;
+  display:flex;flex-direction:column;gap:10px;}
+.chat-body::-webkit-scrollbar{display:none;}
+
+/* mascot intro area */
+.chat-mascot{display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding:8px 0 4px;}
+.chat-mascot-img{width:110px;height:110px;border-radius:50%;overflow:hidden;
+  box-shadow:0 8px 28px rgba(74,128,232,.18);
+  border:3px solid var(--accentL);}
+.chat-mascot-img img{width:100%;height:100%;object-fit:cover;object-position:center 15%;}
+.chat-mascot-name{font-size:.78rem;font-weight:700;color:var(--text2);}
+
+/* message bubbles */
+.cmsg{display:flex;flex-direction:column;max-width:82%;}
+.cmsg.ai{align-self:flex-start;}
+.cmsg.user{align-self:flex-end;}
+.cmsg-bubble{padding:10px 13px;border-radius:18px;font-size:.8rem;line-height:1.45;
+  word-break:break-word;}
+.cmsg.ai .cmsg-bubble{background:var(--card);box-shadow:var(--sh);
+  color:var(--text);border-bottom-left-radius:4px;}
+.cmsg.user .cmsg-bubble{background:linear-gradient(120deg,#4A80E8,#6B5CF6);
+  color:#fff;border-bottom-right-radius:4px;}
+.cmsg-time{font-size:.58rem;color:var(--text3);margin-top:3px;padding:0 4px;}
+.cmsg.user .cmsg-time{text-align:right;}
+
+/* suggestion chips */
+.chat-sugs{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 8px;}
+.chat-sug{padding:7px 12px;border-radius:var(--r-full);
+  border:1.5px solid var(--accent);background:var(--accentL);
+  font-size:.7rem;font-weight:600;color:var(--accent);
+  font-family:inherit;cursor:pointer;transition:all .15s;}
+.chat-sug:active{background:var(--accent);color:#fff;}
+
+/* input bar */
+.chat-input-bar{display:flex;align-items:center;gap:8px;
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));
+  border-top:1px solid var(--card2);background:var(--bg);}
+.chat-inp{flex:1;border:1.5px solid var(--card2);border-radius:var(--r-full);
+  background:var(--card);padding:10px 16px;font-size:.82rem;
+  font-family:inherit;color:var(--text);outline:none;
+  transition:border-color .15s;}
+.chat-inp:focus{border-color:var(--accent);}
+.chat-inp::placeholder{color:var(--text3);}
+.chat-send{width:38px;height:38px;border-radius:50%;border:none;
+  background:var(--accent);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;transition:transform .1s,opacity .15s;
+  box-shadow:0 4px 12px rgba(74,128,232,.35);}
+.chat-send:active{transform:scale(.92);opacity:.88;}
+.chat-send svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5;
+  stroke-linecap:round;stroke-linejoin:round;}
+</style>
+
+<div id="root"></div>
+<script>
+const {useState}=React;
+const h=React.createElement;
+
+/* ── CAT MASCOT ── */
+const CAT_IMG="data:image/jpeg;base64,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";
+
+/* ── DATA ── */
+const CATS=[
+  {id:"dentist",label:"Dentist",labelTh:"ทันตแพทย์",
+   svg:()=>h("svg",{width:30,height:30,viewBox:"0 0 48 48"},
+     h("defs",null,
+       h("linearGradient",{id:"dg3",x1:"0%",y1:"0%",x2:"100%",y2:"100%"},
+         h("stop",{offset:"0%",stopColor:"#F97316"}),
+         h("stop",{offset:"100%",stopColor:"#FB923C"}))),
+     /* tooth shape */
+     h("path",{fill:"url(#dg3)",d:"M17 7c-3.5 0-8 3.5-8 10 0 4.5 1.5 8 3.5 11l2 8c.4 1.8 1.6 1.8 2 0l1.5-6.5 1 2 1-2L21.5 36c.4 1.8 1.6 1.8 2 0l2-8c2-3 3.5-6.5 3.5-11 0-6.5-4.5-10-8-10-1.5 0-2.8.8-3 1.5-.2-.7-1.5-1.5-3-1.5z"}),
+     /* mirror image right lobe */
+     h("path",{fill:"url(#dg3)",d:"M31 7c1.5 0 2.8.8 3 1.5V7h-3z",opacity:0}),
+     /* top ridge line for tooth */
+     h("path",{fill:"none",stroke:"rgba(255,255,255,.45)",strokeWidth:1.5,strokeLinecap:"round",
+       d:"M20 9 Q24 7 28 9"}))},
+  {id:"doctor",label:"Doctor",labelTh:"แพทย์ทั่วไป",
+   svg:()=>h("svg",{width:30,height:30,viewBox:"0 0 48 48"},
+     /* stethoscope tube - solid color for reliable rendering */
+     h("path",{fill:"none",stroke:"#6366F1",strokeWidth:3.8,strokeLinecap:"round",strokeLinejoin:"round",
+       d:"M13 10 C13 10 13 22 22 26 C31 30 33 32 33 38"}),
+     /* ear connector top bar */
+     h("path",{fill:"none",stroke:"#6366F1",strokeWidth:3.8,strokeLinecap:"round",
+       d:"M11 13 L19 13"}),
+     /* left earpiece */
+     h("circle",{cx:11,cy:10,r:3.2,fill:"#6366F1"}),
+     /* right earpiece */
+     h("circle",{cx:19,cy:10,r:3.2,fill:"#6366F1"}),
+     /* chest piece outer ring */
+     h("circle",{cx:33,cy:39,r:5.5,fill:"#6366F1"}),
+     /* chest piece inner shine */
+     h("circle",{cx:33,cy:39,r:2.8,fill:"#fff",opacity:.55}),
+     /* cross on chest piece */
+     h("line",{x1:33,y1:37,x2:33,y2:41,stroke:"#6366F1",strokeWidth:1.8,strokeLinecap:"round"}),
+     h("line",{x1:31,y1:39,x2:35,y2:39,stroke:"#6366F1",strokeWidth:1.8,strokeLinecap:"round"}))},
+  {id:"physiotherapy",label:"Physio",labelTh:"กายภาพ",
+   svg:()=>h("svg",{width:30,height:30,viewBox:"0 0 48 48"},
+     /* head */
+     h("circle",{cx:24,cy:9,r:4,fill:"#F97316"}),
+     /* body torso */
+     h("line",{x1:24,y1:13,x2:24,y2:28,stroke:"#F97316",strokeWidth:3,strokeLinecap:"round"}),
+     /* left arm raised up */
+     h("line",{x1:24,y1:18,x2:13,y2:12,stroke:"#F97316",strokeWidth:3,strokeLinecap:"round"}),
+     /* right arm stretched out */
+     h("line",{x1:24,y1:18,x2:36,y2:22,stroke:"#F97316",strokeWidth:3,strokeLinecap:"round"}),
+     /* left leg */
+     h("line",{x1:24,y1:28,x2:15,y2:40,stroke:"#F97316",strokeWidth:3,strokeLinecap:"round"}),
+     /* right leg bent */
+     h("line",{x1:24,y1:28,x2:34,y2:36,stroke:"#F97316",strokeWidth:3,strokeLinecap:"round"}),
+     h("line",{x1:34,y1:36,x2:38,y2:42,stroke:"#F97316",strokeWidth:3,strokeLinecap:"round"}))},
+  {id:"pharmacy",label:"Pharmacy",labelTh:"เภสัช",
+   svg:()=>h("svg",{width:30,height:30,viewBox:"0 0 48 48"},
+     h("defs",null,
+       h("linearGradient",{id:"phg3",x1:"0%",y1:"0%",x2:"100%",y2:"100%"},
+         h("stop",{offset:"0%",stopColor:"#22C55E"}),
+         h("stop",{offset:"100%",stopColor:"#10B981"}))),
+     /* pill shape */
+     h("rect",{x:8,y:18,width:32,height:12,rx:6,
+       fill:"url(#phg3)",transform:"rotate(-35 24 24)"}),
+     /* pill divider */
+     h("line",{x1:18,y1:33,x2:30,y2:15,
+       stroke:"rgba(255,255,255,.55)",strokeWidth:2,strokeLinecap:"round"}),
+     /* right half lighter */
+     h("path",{fill:"rgba(255,255,255,.2)",
+       d:"M24 24 Q30 16 34 16.5 Q38 17 37.5 22 Q37 28 30 30 Z",
+       transform:"rotate(-35 24 24)"}))},
+];
+
+const WEEK=[
+  {d:"MON",n:9},{d:"TUE",n:10},{d:"WED",n:11},
+  {d:"THU",n:12},{d:"FRI",n:13},{d:"SAT",n:14},{d:"SUN",n:15}
+];
+
+const DOCTORS=[
+  {id:1,name:"Dr. Sarah Kim",spec:"Heart Surgeon",loc:"Bangkok",
+   emoji:"👩‍⚕️",bg:"linear-gradient(135deg,#FFE4F0,#FFD0E5)",
+   avail:true,patients:500,exp:10,
+   about:"Specialist in cardiovascular surgery with over 10 years of clinical experience treating complex cardiac conditions in leading hospitals across Southeast Asia."},
+  {id:2,name:"Dr. James Liu",spec:"Heart Surgeon",loc:"Bangkok",
+   emoji:"👨‍⚕️",bg:"linear-gradient(135deg,#E4EEFF,#D0DEFF)",
+   avail:true,patients:420,exp:8,
+   about:"Dedicated cardiologist with expertise in minimally invasive procedures and preventive cardiac care, serving over 400 patients."},
+  {id:3,name:"Dr. Nida Tanaka",spec:"Dentist",loc:"Bangkok",
+   emoji:"👩‍⚕️",bg:"linear-gradient(135deg,#FFF4E4,#FFE8D0)",
+   avail:false,patients:380,exp:7,
+   about:"Experienced dental surgeon specializing in cosmetic dentistry, orthodontics, and comprehensive oral health care for all ages."},
+  {id:4,name:"Dr. Prem Vichit",spec:"Ophthalmologist",loc:"Bangkok",
+   emoji:"👨‍⚕️",bg:"linear-gradient(135deg,#E4FFF4,#D0FFEE)",
+   avail:true,patients:280,exp:9,
+   about:"Eye care specialist with expertise in laser vision correction, cataract surgery, and treatment of retinal diseases."},
+  {id:5,name:"Dr. Malee Srisuk",spec:"Neurologist",loc:"Bangkok",
+   emoji:"👩‍⚕️",bg:"linear-gradient(135deg,#F0E4FF,#E4D0FF)",
+   avail:true,patients:320,exp:12,
+   about:"Board-certified neurologist specializing in headache disorders, epilepsy, and movement disorders with 12 years of experience."},
+  {id:6,name:"Dr. Tanawat Chen",spec:"Orthopedist",loc:"Bangkok",
+   emoji:"👨‍⚕️",bg:"linear-gradient(135deg,#FFF0E4,#FFE4D0)",
+   avail:false,patients:195,exp:6,
+   about:"Orthopedic surgeon with special interest in sports medicine, joint replacement, and minimally invasive spinal procedures."},
+];
+
+const FEATURED=DOCTORS[0];
+
+/* ── TRANSLATIONS ── */
+const T={
+  en:{
+    hero1:"Let's Find Your",signUp:"Sign Up",search:"Search Doctor",
+    month:"October, 2024",availNote:"Available for your need",
+    appointment:"Appointment",topRated:"Top Rated",seeAll:"See all",
+    doctorList:"Doctor List",detTitle:"Appointment",
+    patients:"Patients",experience:"Experience",
+    bookBtn:"Book Appointment",aboutDoc:"About Doctor",
+    upcomingSched:"Upcoming schedule",
+    tagline:"Your health, our priority",
+    welcomeBack:"Welcome back",signInSub:"Sign in to your account",
+    emailLbl:"Email",passLbl:"Password",forgotPass:"Forgot password?",
+    signInBtn:"Sign In",orWith:"or continue with",
+    noAccount:"Don't have an account?",
+    createAcc:"Create account",createSub:"Join MedFind today — it's free",
+    fullName:"Full Name",phone:"Phone",createBtn:"Create Account",
+    haveAccount:"Already have an account?",
+    navHome:"Home",navChat:"Chat",navSchedule:"Schedule",navProfile:"Profile",
+    chatTitle:"AI Health Assistant",chatGreet:"Hi there! I'm Dr. Paw 🐾, your AI health assistant. How can I help you today?",
+    chatPlaceholder:"Type a message...",chatSend:"Send",
+    chatSug1:"Find a doctor near me",chatSug2:"What are the symptoms of flu?",chatSug3:"Book an appointment",
+    chatReply:{
+      "find":"I can help you find doctors nearby! Please go to the Home screen and tap any category to browse available specialists in Bangkok.",
+      "doctor":"Looking for a doctor? Try browsing our categories: Dentist, General Doctor, Physiotherapy, or Pharmacy. Just tap the category on the home screen!",
+      "appointment":"To book an appointment, browse our doctor list, select a doctor, and tap 'Book Appointment'. Simple and quick!",
+      "symptom":"For symptom information, I recommend consulting one of our qualified doctors. Tap a specialist category on the home screen to get started.",
+      "flu":"Common flu symptoms include fever, chills, muscle aches, cough, runny nose, and fatigue. If symptoms are severe, please see a doctor soon.",
+      "pharmacy":"Our pharmacy partners can help with prescriptions and over-the-counter medications. Find the nearest pharmacy on the home screen!",
+      "default":"That's a great question! For the most accurate health advice, I recommend consulting one of our verified doctors. Would you like help finding one?"
+    },
+    fillAll:"Please fill in all fields.",
+    invalidEmail:"Invalid email address.",
+    passLength:"Password must be at least 6 characters.",
+    spec:{"Heart Surgeon":"Heart Surgeon","Dentist":"Dentist",
+      "Ophthalmologist":"Ophthalmologist","Neurologist":"Neurologist","Orthopedist":"Orthopedist"}
+  },
+  th:{
+    hero1:"ค้นหาหมอของคุณ",
+    signUp:"สมัครสมาชิก",
+    search:"ค้นหาแพทย์",
+    month:"ตุลาคม 2024",
+    availNote:"พร้อมให้บริการ",
+    appointment:"นัดหมาย",
+    topRated:"แพทย์ยอดนิยม",
+    seeAll:"ดูทั้งหมด",
+    doctorList:"รายชื่อแพทย์",
+    detTitle:"นัดหมาย",
+    patients:"ผู้ป่วย",
+    experience:"ประสบการณ์",
+    bookBtn:"จองนัดหมาย",
+    aboutDoc:"เกี่ยวกับแพทย์",
+    upcomingSched:"ตารางนัดหมาย",
+    tagline:"สุขภาพคุณ คือความใส่ใจของเรา",
+    welcomeBack:"ยินดีต้อนรับกลับ",
+    signInSub:"เข้าสู่ระบบบัญชีของคุณ",
+    emailLbl:"อีเมล",
+    passLbl:"รหัสผ่าน",
+    forgotPass:"ลืมรหัสผ่าน?",
+    signInBtn:"เข้าสู่ระบบ",
+    orWith:"หรือเข้าสู่ระบบด้วย",
+    noAccount:"ยังไม่มีบัญชี?",
+    createAcc:"สร้างบัญชีใหม่",
+    createSub:"สมัครสมาชิก MedFind ฟรี!",
+    fullName:"ชื่อ-นามสกุล",
+    phone:"เบอร์โทรศัพท์",
+    createBtn:"สร้างบัญชี",
+    haveAccount:"มีบัญชีอยู่แล้ว?",
+    navHome:"หน้าหลัก",navChat:"แชท",navSchedule:"ตาราง",navProfile:"โปรไฟล์",
+    chatTitle:"AI ผู้ช่วยสุขภาพ",chatGreet:"สวัสดีครับ! ผมหมอ Paw 🐾 AI ผู้ช่วยด้านสุขภาพของคุณ วันนี้มีอะไรให้ช่วยไหม?",
+    chatPlaceholder:"พิมพ์ข้อความ...",chatSend:"ส่ง",
+    chatSug1:"หาหมอใกล้ฉัน",chatSug2:"อาการไข้หวัดใหญ่คืออะไร?",chatSug3:"จองนัดหมาย",
+    chatReply:{
+      "find":"ผมช่วยหาหมอใกล้คุณได้ครับ! ไปที่หน้าหลักแล้วเลือกประเภทที่ต้องการเพื่อดูรายชื่อแพทย์ในกรุงเทพฯ",
+      "doctor":"กำลังหาแพทย์อยู่ใช่ไหมครับ? ลองดูหมวดหมู่: ทันตแพทย์, แพทย์ทั่วไป, กายภาพบำบัด หรือเภสัชกร ที่หน้าหลักได้เลย!",
+      "appointment":"หากต้องการจองนัด ให้เลือกแพทย์จากรายชื่อ แล้วกด 'จองนัดหมาย' ง่ายมากครับ!",
+      "symptom":"สำหรับข้อมูลอาการ แนะนำให้ปรึกษาแพทย์เฉพาะทางของเราครับ กดเลือกหมวดหมู่ที่หน้าหลักได้เลย",
+      "flu":"อาการไข้หวัดใหญ่ทั่วไปได้แก่ มีไข้ หนาวสั่น ปวดเมื่อยกล้ามเนื้อ ไอ น้ำมูกไหล และอ่อนเพลีย หากอาการรุนแรงควรพบแพทย์ด่วน",
+      "pharmacy":"ร้านยาพาร์ทเนอร์ของเราช่วยจัดการยาตามใบสั่งและยาสามัญได้ครับ หาร้านยาใกล้เคียงได้ที่หน้าหลัก!",
+      "default":"คำถามดีมากครับ! เพื่อความแม่นยำสูงสุด แนะนำปรึกษาแพทย์ที่ผ่านการรับรองของเราครับ ต้องการความช่วยเหลือในการหาหมอไหม?"
+    },
+    fillAll:"กรุณากรอกข้อมูลให้ครบถ้วน",
+    invalidEmail:"รูปแบบอีเมลไม่ถูกต้อง",
+    passLength:"รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
+    spec:{"Heart Surgeon":"ศัลยแพทย์หัวใจ",
+      "Dentist":"ทันตแพทย์",
+      "Ophthalmologist":"จักษุแพทย์",
+      "Neurologist":"ประสาทแพทย์",
+      "Orthopedist":"ศัลยแพทย์กระดูก"}
+  }
+};
+
+function App(){
+  const [screen,setScreen]=useState("home"); // home|list|detail
+  const [selDoc,setSelDoc]=useState(null);
+  const [selDay,setSelDay]=useState(11);
+  const [tab,setTab]=useState("home");
+  const [authScreen,setAuthScreen]=useState(null); // signin|signup|null
+  const [authName,setAuthName]=useState("");
+  const [authPhone,setAuthPhone]=useState("");
+  const [authEmail,setAuthEmail]=useState("");
+  const [authPass,setAuthPass]=useState("");
+  const [authErr,setAuthErr]=useState("");
+  const [showPass,setShowPass]=useState(false);
+  const [loggedIn,setLoggedIn]=useState(false);
+  const [lang,setLang]=useState("en");
+  const tx=T[lang]; // shorthand
+  const [chatMsgs,setChatMsgs]=useState([]);
+  const [chatInput,setChatInput]=useState("");
+
+  /* ── STATUS BAR ── */
+  const SBar=()=>h("div",{className:"sbar"},
+    h("span",null,"10:30"),
+    h("div",{className:"sbar-r"},
+      h("svg",{viewBox:"0 0 24 24"},
+        h("path",{d:"M1.5 8.5a13 13 0 0121 0M5 12a10 10 0 0114 0M8.5 15.5a6 6 0 017 0M12 19h.01"})),
+      h("svg",{viewBox:"0 0 24 24"},
+        h("rect",{x:2,y:7,width:16,height:10,rx:2}),h("path",{d:"M22 11v2"})),
+      h("span",{style:{fontWeight:700,fontSize:".61rem"}},"100%")
+    )
+  );
+
+  /* ── BOTTOM NAV ── */
+  const BNav=()=>h("div",{className:"bnav"},
+    h("div",{className:"bnav-inner"},
+      // Home
+      h("button",{className:"bni"+(tab==="home"?" act":""),
+        onClick:()=>{setTab("home");setScreen("home");}},
+        h("svg",{viewBox:"0 0 24 24"},
+          h("path",{d:"M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"}),
+          h("polyline",{points:"9 22 9 12 15 12 15 22"})),
+        h("span",{className:"bni-lbl"},tx.navHome)
+      ),
+      // Chat
+      h("button",{className:"bni"+(tab==="chat"?" act":""),
+        onClick:()=>{setTab("chat");setScreen("chat");}},
+        h("svg",{viewBox:"0 0 24 24"},
+          h("path",{d:"M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"})),
+        h("span",{className:"bni-badge"},"2"),
+        h("span",{className:"bni-lbl"},tx.navChat)
+      ),
+      // FAB
+      h("button",{className:"bni-fab",onClick:()=>{}},
+        h("svg",{viewBox:"0 0 24 24"},
+          h("line",{x1:12,y1:5,x2:12,y2:19}),h("line",{x1:5,y1:12,x2:19,y2:12}))
+      ),
+      // Calendar
+      h("button",{className:"bni"+(tab==="bookings"?" act":""),
+        onClick:()=>setTab("bookings")},
+        h("svg",{viewBox:"0 0 24 24"},
+          h("rect",{x:3,y:4,width:18,height:18,rx:2}),
+          h("line",{x1:16,y1:2,x2:16,y2:6}),h("line",{x1:8,y1:2,x2:8,y2:6}),
+          h("line",{x1:3,y1:10,x2:21,y2:10})),
+        h("span",{className:"bni-lbl"},tx.navSchedule)
+      ),
+      // Profile
+      h("button",{className:"bni"+(tab==="profile"?" act":""),
+        onClick:()=>setTab("profile")},
+        h("svg",{viewBox:"0 0 24 24"},
+          h("path",{d:"M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"}),
+          h("circle",{cx:12,cy:7,r:4})),
+        h("span",{className:"bni-lbl"},tx.navProfile)
+      )
+    )
+  );
+
+  /* ── AUTH: SIGN IN ── */
+  const doSignIn=()=>{
+    setAuthErr("");
+    if(!authEmail.trim()||!authPass){setAuthErr(tx.fillAll);return;}
+    if(!authEmail.includes("@")){setAuthErr(tx.invalidEmail);return;}
+    if(authPass.length<6){setAuthErr(tx.passLength);return;}
+    setLoggedIn(true);setAuthScreen(null);
+  };
+
+  const SignIn=()=>h("div",{className:"auth-scr"},
+    h("div",{className:"auth-hero"},
+      h("div",{className:"auth-logo"},
+        h("svg",{viewBox:"0 0 24 24"},h("path",{d:"M22 12h-4l-3 9L9 3l-3 9H2"}))),
+      h("div",{className:"auth-brand"},"Med",h("span",null,"Find")),
+      h("div",{className:"auth-tagline"},tx.tagline)
+    ),
+    h("div",{className:"auth-body"},
+      h("div",null,
+        h("div",{className:"auth-title"},tx.welcomeBack),
+        h("div",{className:"auth-sub"},tx.signInSub)
+      ),
+      h("div",{className:"auth-field"},
+        h("label",null,tx.emailLbl),
+        h("div",{className:"auth-iw"},
+          h("div",{className:"auth-ii"},
+            h("svg",{viewBox:"0 0 24 24"},
+              h("path",{d:"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"}),
+              h("polyline",{points:"22,6 12,13 2,6"}))),
+          h("input",{className:"auth-inp",type:"email",placeholder:"your@email.com",
+            value:authEmail,onChange:e=>{setAuthEmail(e.target.value);setAuthErr("");}})
+        )
+      ),
+      h("div",{className:"auth-field"},
+        h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"}},
+          h("label",null,tx.passLbl),
+          h("button",{className:"auth-forgot"},tx.forgotPass)
+        ),
+        h("div",{className:"auth-iw"},
+          h("div",{className:"auth-ii"},
+            h("svg",{viewBox:"0 0 24 24"},
+              h("rect",{x:3,y:11,width:18,height:11,rx:2,ry:2}),
+              h("path",{d:"M7 11V7a5 5 0 0110 0v4"}))),
+          h("input",{className:"auth-inp",type:showPass?"text":"password",
+            placeholder:"Min. 6 characters",
+            value:authPass,onChange:e=>{setAuthPass(e.target.value);setAuthErr("");}}),
+          h("button",{className:"auth-eye",onClick:()=>setShowPass(p=>!p)},
+            h("svg",{viewBox:"0 0 24 24"},
+              showPass
+                ?[h("path",{key:"a",d:"M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"}),
+                  h("line",{key:"b",x1:1,y1:1,x2:23,y2:23})]
+                :[h("path",{key:"c",d:"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"}),
+                  h("circle",{key:"d",cx:12,cy:12,r:3})]))
+        )
+      ),
+      authErr&&h("div",{className:"auth-err"},authErr),
+      h("button",{className:"auth-btn",onClick:doSignIn},tx.signInBtn),
+      h("div",{className:"auth-div"},h("span",null,tx.orWith)),
+      h("div",{className:"auth-social"},
+        h("button",{className:"auth-soc"},h("span",null,"G"),h("span",null,"Google")),
+        h("button",{className:"auth-soc"},h("span",null,"🍎"),h("span",null,"Apple")),
+        h("button",{className:"auth-soc"},h("span",null,"💬"),h("span",null,"LINE"))
+      ),
+      h("div",{className:"auth-switch"},
+        tx.noAccount,
+        h("button",{className:"auth-swlink",
+          onClick:()=>{setAuthScreen("signup");setAuthErr("");}},
+          tx.signUp)
+      )
+    )
+  );
+
+  /* ── AUTH: SIGN UP ── */
+  const doSignUp=()=>{
+    setAuthErr("");
+    if(!authName.trim()||!authPhone.trim()||!authEmail.trim()||!authPass){
+      setAuthErr(tx.fillAll);return;}
+    if(!authEmail.includes("@")){setAuthErr(tx.invalidEmail);return;}
+    if(authPass.length<6){setAuthErr(tx.passLength);return;}
+    setLoggedIn(true);setAuthScreen(null);
+  };
+
+  const SignUp=()=>h("div",{className:"auth-scr"},
+    h("div",{className:"auth-hero"},
+      h("div",{className:"auth-logo"},
+        h("svg",{viewBox:"0 0 24 24"},h("path",{d:"M22 12h-4l-3 9L9 3l-3 9H2"}))),
+      h("div",{className:"auth-brand"},"Med",h("span",null,"Find")),
+      h("div",{className:"auth-tagline"},tx.tagline)
+    ),
+    h("div",{className:"auth-body"},
+      h("div",null,
+        h("div",{className:"auth-title"},tx.createAcc),
+        h("div",{className:"auth-sub"},tx.createSub)
+      ),
+      ...[
+        {label:tx.fullName,type:"text",ph:"Your full name",val:authName,set:setAuthName,
+         icon:h("path",{d:"M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2 M12 11a4 4 0 100-8 4 4 0 000 8z"})},
+        {label:tx.phone,type:"tel",ph:"0xx-xxx-xxxx",val:authPhone,set:setAuthPhone,
+         icon:h("path",{d:"M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 8.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"})},
+        {label:tx.emailLbl,type:"email",ph:"your@email.com",val:authEmail,set:setAuthEmail,
+         icon:h("path",{d:"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"})},
+      ].map(f=>h("div",{key:f.label,className:"auth-field"},
+        h("label",null,f.label),
+        h("div",{className:"auth-iw"},
+          h("div",{className:"auth-ii"},h("svg",{viewBox:"0 0 24 24"},f.icon)),
+          h("input",{className:"auth-inp",type:f.type,placeholder:f.ph,
+            value:f.val,onChange:e=>{f.set(e.target.value);setAuthErr("");}})
+        )
+      )),
+      h("div",{className:"auth-field"},
+        h("label",null,tx.passLbl),
+        h("div",{className:"auth-iw"},
+          h("div",{className:"auth-ii"},
+            h("svg",{viewBox:"0 0 24 24"},
+              h("rect",{x:3,y:11,width:18,height:11,rx:2}),
+              h("path",{d:"M7 11V7a5 5 0 0110 0v4"}))),
+          h("input",{className:"auth-inp",type:showPass?"text":"password",
+            placeholder:"Min. 6 characters",
+            value:authPass,onChange:e=>{setAuthPass(e.target.value);setAuthErr("");}}),
+          h("button",{className:"auth-eye",onClick:()=>setShowPass(p=>!p)},
+            h("svg",{viewBox:"0 0 24 24"},
+              showPass
+                ?[h("path",{key:"a",d:"M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"}),
+                  h("line",{key:"b",x1:1,y1:1,x2:23,y2:23})]
+                :[h("path",{key:"c",d:"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"}),
+                  h("circle",{key:"d",cx:12,cy:12,r:3})]))
+        )
+      ),
+      authErr&&h("div",{className:"auth-err"},authErr),
+      h("button",{className:"auth-btn",onClick:doSignUp},tx.createBtn),
+      h("div",{className:"auth-div"},h("span",null,tx.orWith)),
+      h("div",{className:"auth-social"},
+        h("button",{className:"auth-soc"},h("span",null,"G"),h("span",null,"Google")),
+        h("button",{className:"auth-soc"},h("span",null,"🍎"),h("span",null,"Apple")),
+        h("button",{className:"auth-soc"},h("span",null,"💬"),h("span",null,"LINE"))
+      ),
+      h("div",{className:"auth-switch"},
+        tx.haveAccount,
+        h("button",{className:"auth-swlink",
+          onClick:()=>{setAuthScreen("signin");setAuthErr("");}},
+          tx.signInBtn)
+      )
+    )
+  );
+
+  /* ── HOME SCREEN ── */
+  const HomeScr=()=>h("div",{className:"scr"},
+    // Top bar
+    h("div",{className:"h-topbar"},
+      h("div",{className:"h-menu"},
+        h("span",null),h("span",null),h("span",null)
+      ),
+      h("div",{className:"lang-toggle"},
+        h("button",{className:"lang-btn"+(lang==="en"?" act":""),
+          onClick:()=>setLang("en")},"EN"),
+        h("button",{className:"lang-btn"+(lang==="th"?" act":""),
+          onClick:()=>setLang("th")},"TH")
+      ),
+      loggedIn
+        ? h("div",{className:"h-avatar"},"👤")
+        : h("button",{className:"h-signup",onClick:()=>setAuthScreen("signup")},tx.signUp)
+    ),
+    // Hero
+    h("div",{className:"h-hero"},
+      h("div",{className:"h-title"},tx.hero1,h("br",null),
+        h("span",{style:{color:"var(--accent)"}},"HealthMate"))
+    ),
+    // Categories
+    h("div",{className:"h-cats"},
+      CATS.map(c=>h("div",{key:c.id,className:"h-cat",
+        onClick:()=>{setScreen("list");}},
+        h("div",{className:"h-cat-circle"},h(c.svg,null)),
+        h("div",{className:"h-cat-lbl"},lang==="th"?c.labelTh:c.label)
+      ))
+    ),
+    // Search
+    h("div",{className:"h-search"},
+      h("svg",{viewBox:"0 0 24 24"},
+        h("circle",{cx:11,cy:11,r:8}),h("line",{x1:21,y1:21,x2:16.65,y2:16.65})),
+      h("input",{placeholder:tx.search})
+    ),
+    // Calendar
+    h("div",{className:"h-cal"},
+      h("div",{className:"h-cal-month"},tx.month),
+      h("div",{className:"h-cal-week"},
+        WEEK.map(w=>h("div",{key:w.n,
+          className:"h-cal-day"+(selDay===w.n?" act":""),
+          onClick:()=>setSelDay(w.n)},
+          h("div",{className:"h-cal-dname"},w.d),
+          h("div",{className:"h-cal-dnum"},w.n)
+        ))
+      )
+    ),
+    // Featured doctor card
+    h("div",{className:"h-feat"},
+      h("div",{className:"h-feat-inner"},
+        h("div",{className:"h-feat-info"},
+          h("div",{className:"h-feat-name"},FEATURED.name),
+          h("div",{className:"h-feat-spec"},FEATURED.spec+", "+FEATURED.loc),
+          h("div",{className:"h-feat-avail"},tx.availNote)
+        ),
+        h("div",{className:"h-feat-right"},
+          h("div",{className:"h-feat-av",style:{background:FEATURED.bg}},
+            FEATURED.emoji,
+            h("div",{className:"h-feat-dot"})
+          ),
+          h("button",{className:"h-feat-btn",
+            onClick:()=>{setSelDoc(FEATURED);setScreen("detail");}},
+            tx.appointment)
+        )
+      )
+    ),
+    // Top Rated section
+    h("div",{className:"sec-hdr",style:{marginTop:20}},
+      h("span",{className:"sec-ttl"},tx.topRated),
+      h("button",{className:"sec-see",onClick:()=>setScreen("list")},tx.seeAll)
+    ),
+    h("div",{className:"h-rated"},
+      DOCTORS.slice(0,4).map(d=>h("div",{key:d.id,className:"h-doc-card",
+        onClick:()=>{setSelDoc(d);setScreen("detail");}},
+        h("div",{className:"h-doc-av",style:{background:d.bg}},
+          d.emoji,
+          d.avail&&h("div",{className:"h-doc-avdot"})
+        ),
+        h("div",{className:"h-doc-nm"},d.name),
+        h("div",{className:"h-doc-sp"},tx.spec[d.spec]||d.spec),
+        h("button",{className:"h-doc-appt",
+          onClick:e=>{e.stopPropagation();setSelDoc(d);setScreen("detail");}},
+          tx.appointment)
+      ))
+    )
+  );
+
+  /* ── LIST SCREEN ── */
+  const ListScr=()=>h("div",{className:"scr"},
+    h("div",{className:"list-hdr"},
+      h("button",{className:"list-back",onClick:()=>setScreen("home")},
+        h("svg",{viewBox:"0 0 24 24"},h("polyline",{points:"15 18 9 12 15 6"}))),
+      h("div",{className:"list-title"},tx.doctorList)
+    ),
+    h("div",{className:"list-grid"},
+      DOCTORS.map(d=>h("div",{key:d.id,className:"list-card",
+        onClick:()=>{setSelDoc(d);setScreen("detail");}},
+        h("div",{className:"list-av",style:{background:d.bg}},
+          d.emoji,
+          d.avail&&h("div",{className:"list-avdot"})
+        ),
+        h("div",{className:"list-nm"},d.name),
+        h("div",{className:"list-sp"},(tx.spec[d.spec]||d.spec)+", "+d.loc),
+        h("button",{className:"list-appt-btn",
+          onClick:e=>{e.stopPropagation();setSelDoc(d);setScreen("detail");}},
+          tx.appointment)
+      ))
+    )
+  );
+
+  /* ── DETAIL SCREEN ── */
+  const DetailScr=()=>{
+    const doc=selDoc||DOCTORS[0];
+    return h("div",{className:"scr"},
+      h("div",{className:"det-hdr"},
+        h("button",{className:"det-back",
+          onClick:()=>setScreen(screen==="detail"?"list":"list")},
+          h("svg",{viewBox:"0 0 24 24"},h("polyline",{points:"15 18 9 12 15 6"}))),
+        h("div",{className:"det-title"},tx.detTitle)
+      ),
+      // Doctor row
+      h("div",{className:"det-doc-row"},
+        h("div",{className:"det-doc-av",style:{background:doc.bg}},
+          doc.emoji,h("div",{className:"det-doc-avdot"})
+        ),
+        h("div",{className:"det-doc-info"},
+          h("div",{className:"det-doc-name"},doc.name),
+          h("div",{className:"det-doc-spec"},(tx.spec[doc.spec]||doc.spec)+", "+doc.loc)
+        )
+      ),
+      // Stats
+      h("div",{className:"det-stats"},
+        h("div",{className:"det-stat"},
+          h("div",{className:"det-stat-lbl"},tx.patients),
+          h("div",{className:"det-stat-val orange"},doc.patients+"+")),
+        h("div",{className:"det-stat"},
+          h("div",{className:"det-stat-lbl"},tx.experience),
+          h("div",{className:"det-stat-val pink"},doc.exp+"yrs+"))
+      ),
+      // Book button
+      h("button",{className:"det-book-btn"},tx.bookBtn),
+      // About
+      h("div",{className:"det-sec"},
+        h("div",{className:"det-sec-ttl"},tx.aboutDoc),
+        h("div",{className:"det-sec-body"},doc.about)
+      ),
+      // Schedule
+      h("div",{className:"det-sec"},
+        h("div",{className:"det-sec-ttl"},tx.upcomingSched),
+        h("div",{className:"det-sched"},
+          h("div",{className:"det-sched-badge"},
+            h("div",{className:"det-sched-dname"},"WED"),
+            h("div",{className:"det-sched-dnum"},"11")
+          ),
+          h("div",{className:"det-sched-info"},
+            h("div",{className:"det-sched-spec"},tx.spec[doc.spec]||doc.spec),
+            h("div",{className:"det-sched-time"},"9:00 am")
+          ),
+          h("div",{className:"det-sched-actions"},
+            h("button",{className:"det-sched-ic call"},
+              h("svg",{viewBox:"0 0 24 24"},
+                h("path",{d:"M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 8.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"}))),
+            h("button",{className:"det-sched-ic vid"},
+              h("svg",{viewBox:"0 0 24 24"},
+                h("polygon",{points:"23 7 16 12 23 17 23 7"}),
+                h("rect",{x:1,y:5,width:15,height:14,rx:2,ry:2})))
+          )
+        )
+      )
+    );
+  };
+
+  /* ── CHAT SCREEN ── */
+  const ChatScr=()=>{
+    const now=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const getReply=(text)=>{
+      const low=text.toLowerCase();
+      const r=tx.chatReply;
+      if(low.includes("find")||low.includes("near")||low.includes("หา")||low.includes("ใกล้")) return r.find;
+      if(low.includes("doctor")||low.includes("หมอ")||low.includes("แพทย์")) return r.doctor;
+      if(low.includes("appointment")||low.includes("book")||low.includes("จอง")||low.includes("นัด")) return r.appointment;
+      if(low.includes("symptom")||low.includes("อาการ")) return r.symptom;
+      if(low.includes("flu")||low.includes("ไข้หวัด")||low.includes("ไข้")) return r.flu;
+      if(low.includes("pharmacy")||low.includes("เภสัช")||low.includes("ยา")) return r.pharmacy;
+      return r.default;
+    };
+    const sendMsg=(text)=>{
+      if(!text.trim()) return;
+      const t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      const userMsg={role:"user",text,time:t};
+      const aiMsg={role:"ai",text:getReply(text),time:t};
+      setChatMsgs(prev=>[...prev,userMsg,aiMsg]);
+      setChatInput("");
+    };
+    const showSugs=chatMsgs.length===0;
+    return h("div",{className:"chat-scr"},
+      h("div",{className:"chat-hdr"},
+        h("button",{className:"chat-back",onClick:()=>{setTab("home");setScreen("home");}},
+          h("svg",{viewBox:"0 0 24 24"},h("polyline",{points:"15 18 9 12 15 6"}))),
+        h("div",{className:"chat-hdr-info"},
+          h("div",{className:"chat-hdr-name"},"Dr. Paw"),
+          h("div",{className:"chat-hdr-status"},"● Online")),
+        h("div",{className:"chat-hdr-av"},h("img",{src:CAT_IMG,alt:"Dr. Paw"}))
+      ),
+      h("div",{className:"chat-body"},
+        h("div",{className:"chat-mascot"},
+          h("div",{className:"chat-mascot-img"},h("img",{src:CAT_IMG,alt:"Dr. Paw"})),
+          h("div",{className:"chat-mascot-name"},tx.chatTitle)
+        ),
+        h("div",{className:"cmsg ai"},
+          h("div",{className:"cmsg-bubble"},tx.chatGreet),
+          h("div",{className:"cmsg-time"},now)
+        ),
+        ...chatMsgs.map((m,i)=>h("div",{key:i,className:"cmsg "+m.role},
+          h("div",{className:"cmsg-bubble"},m.text),
+          h("div",{className:"cmsg-time"},m.time)
+        ))
+      ),
+      showSugs&&h("div",{className:"chat-sugs"},
+        h("button",{className:"chat-sug",onClick:()=>sendMsg(tx.chatSug1)},tx.chatSug1),
+        h("button",{className:"chat-sug",onClick:()=>sendMsg(tx.chatSug2)},tx.chatSug2),
+        h("button",{className:"chat-sug",onClick:()=>sendMsg(tx.chatSug3)},tx.chatSug3)
+      ),
+      h("div",{className:"chat-input-bar"},
+        h("input",{className:"chat-inp",type:"text",placeholder:tx.chatPlaceholder,
+          value:chatInput,
+          onChange:e=>setChatInput(e.target.value),
+          onKeyDown:e=>{if(e.key==="Enter")sendMsg(chatInput);}}),
+        h("button",{className:"chat-send",onClick:()=>sendMsg(chatInput)},
+          h("svg",{viewBox:"0 0 24 24"},
+            h("line",{x1:22,y1:2,x2:11,y2:13}),
+            h("polygon",{points:"22 2 15 22 11 13 2 9 22 2"})))
+      )
+    );
+  };
+
+  /* ── AUTH GUARD ── */
+  if(authScreen==="signin")
+    return h("div",{className:"phone"},h(SBar,null),h(SignIn,null));
+  if(authScreen==="signup")
+    return h("div",{className:"phone"},h(SBar,null),h(SignUp,null));
+
+  return h("div",{className:"phone"},
+    h(SBar,null),
+    screen==="home" ? h(HomeScr,null)
+    :screen==="list" ? h(ListScr,null)
+    :screen==="chat" ? h(ChatScr,null)
+    :h(DetailScr,null),
+    screen==="home" && h("div",{className:"paw-fab",
+      onClick:()=>{setTab("chat");setScreen("chat");}},
+      h("div",{className:"paw-fab-bubble"},
+        lang==="th"?"สวัสดี! มีอะไรให้ช่วยไหมครับ 🐾":"Hi! Need help? 🐾"),
+      h("div",{className:"paw-fab-av"},
+        h("div",{className:"paw-fab-ripple"}),
+        h("img",{src:CAT_IMG,alt:"Dr. Paw"}),
+        h("div",{className:"paw-fab-dot"})
+      ),
+      h("div",{className:"paw-fab-shadow"})
+    ),
+    h(BNav,null)
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(h(App,null));
+</script>
